@@ -5,8 +5,17 @@ import { useRouter } from "next/navigation";
 import { TmLogo, TmButton, TmMoodWheel } from "@/shared/components";
 import { api } from "@/shared/lib/api";
 
-// อารมณ์ที่ถือว่าแย่เกินเกณฑ์ → trigger แบบประเมิน
+// อารมณ์ที่ถือว่าลบ/น่าเป็นห่วง
 const CONCERNING_MOODS = ["เศร้าซึม", "เปล่าเปลี่ยว", "กลัว", "กังวล"];
+
+// เกณฑ์ trigger แบบประเมิน: ≥57% ของ 7 วัน (4 วัน) — อ้างอิง PHQ-9 "more than half the days"
+const THRESHOLD_DAYS = 4;
+const LOOKBACK_DAYS = 7;
+
+interface MoodEntry {
+  mood: string;
+  createdAt: string;
+}
 
 function isWithinMoodHours(): boolean {
   const now = new Date();
@@ -26,14 +35,27 @@ export default function MoodPage() {
     setAvailable(isWithinMoodHours());
   }, []);
 
+  async function checkMoodHistory(): Promise<boolean> {
+    const { data } = await api.get<MoodEntry[]>(`/mood/history?limit=${LOOKBACK_DAYS}`);
+    if (!data || data.length < THRESHOLD_DAYS) return false;
+
+    // นับจำนวนวันที่ mood ลบใน 7 วันล่าสุด
+    const negativeDays = data.filter((entry) =>
+      CONCERNING_MOODS.includes(entry.mood)
+    ).length;
+
+    return negativeDays >= THRESHOLD_DAYS;
+  }
+
   async function handleSubmit() {
     if (!selectedMood || !available) return;
 
     setLoading(true);
     await api.post("/mood", { mood: selectedMood, note: note || undefined });
 
-    // ถ้า mood แย่เกินเกณฑ์ → ถามว่าอยากทำแบบประเมินมั้ย
-    if (CONCERNING_MOODS.includes(selectedMood)) {
+    // เช็ค 7 วันย้อนหลัง: ถ้า mood ลบ ≥ 4 วัน (57%) → trigger แบบประเมิน (อ้างอิง PHQ-9)
+    const shouldTrigger = await checkMoodHistory();
+    if (shouldTrigger) {
       setLoading(false);
       setShowPrompt(true);
     } else {
