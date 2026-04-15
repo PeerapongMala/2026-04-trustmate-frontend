@@ -10,6 +10,7 @@ import {
   TmModal,
   TmLoading,
 } from "@/shared/components";
+import { TmEnvelope } from "@/shared/components/TmEnvelope";
 import { api } from "@/shared/lib/api";
 import type { User } from "@/shared/types/auth";
 
@@ -79,11 +80,18 @@ export default function ProfilePage() {
     <div className="px-4 pt-4">
       {/* Profile header */}
       <div className="flex items-center gap-4">
-        <TmAvatar size="lg" color={user.avatarColor || undefined} />
         <div className="flex-1">
           <h1 className="text-lg font-bold text-tm-navy">{user.alias}</h1>
           <p className="text-sm text-tm-gray">{user.bio || "คำอธิบาย"}</p>
         </div>
+        <TmAvatar size="lg" color={user.avatarColor || undefined} />
+        <button className="text-tm-gray hover:text-tm-navy">
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+            <circle cx="12" cy="5" r="2" />
+            <circle cx="12" cy="12" r="2" />
+            <circle cx="12" cy="19" r="2" />
+          </svg>
+        </button>
       </div>
 
       {/* Edit button */}
@@ -102,6 +110,28 @@ export default function ProfilePage() {
         </TmCard>
       </div>
 
+      {/* Mood graph 7 วัน */}
+      <div className="mt-6">
+        <h2 className="mb-2 text-sm font-bold text-tm-navy">
+          กราฟอารมณ์ย้อนหลัง — ในช่วง 7 วันที่ผ่านมา
+        </h2>
+        <TmCard className="h-40 flex items-center justify-center">
+          <div className="w-full px-2">
+            <div className="flex items-end justify-between gap-1 h-24">
+              {["จ", "อ", "พ", "พฤ", "ศ", "ส", "อา"].map((d, i) => (
+                <div key={d} className="flex flex-col items-center gap-1 flex-1">
+                  <div
+                    className="w-full rounded-t bg-tm-orange/60"
+                    style={{ height: `${20 + Math.random() * 60}%` }}
+                  />
+                  <span className="text-[9px] text-tm-gray">{d}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </TmCard>
+      </div>
+
       {/* Today Card collection */}
       <div className="mt-6">
         <h2 className="mb-3 text-base font-bold text-tm-navy">
@@ -114,17 +144,11 @@ export default function ProfilePage() {
         ) : (
           <div className="grid grid-cols-2 gap-3">
             {cards.map((card) => (
-              <TmCard key={card.id} className="bg-amber-50/50">
-                <p className="text-xs font-medium text-tm-navy line-clamp-2">
-                  {card.question.question}
-                </p>
-                <p className="mt-1 text-[10px] text-tm-gray line-clamp-2">
-                  {card.answer}
-                </p>
-                <p className="mt-1 text-[10px] text-tm-orange">
-                  {new Date(card.createdAt).toLocaleDateString("th-TH")}
-                </p>
-              </TmCard>
+              <TmEnvelope
+                key={card.id}
+                title={card.question.question}
+                subtitle={`${card.answer} — ${new Date(card.createdAt).toLocaleDateString("th-TH")}`}
+              />
             ))}
           </div>
         )}

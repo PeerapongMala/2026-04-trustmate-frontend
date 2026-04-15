@@ -30,7 +30,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <>
-      <TmLogo size="lg" className="mb-8" />
+      <TmLogo size="xl" className="mb-8" />
 
       <TmCard className="w-full">
         {sent ? (

@@ -54,7 +54,7 @@ export default function RegisterPage() {
 
   return (
     <>
-      <TmLogo size="lg" className="mb-8" />
+      <TmLogo size="xl" className="mb-8" />
 
       <TmCard className="w-full">
         <h1 className="mb-6 text-center text-2xl font-bold text-tm-navy">

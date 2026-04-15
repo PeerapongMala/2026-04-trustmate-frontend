@@ -49,7 +49,7 @@ function ResetPasswordContent() {
   if (!token) {
     return (
       <>
-        <TmLogo size="lg" className="mb-8" />
+        <TmLogo size="xl" className="mb-8" />
         <TmCard className="w-full text-center">
           <span className="text-4xl">⚠️</span>
           <p className="mt-4 text-tm-navy font-bold">ลิงก์ไม่ถูกต้อง</p>
@@ -63,7 +63,7 @@ function ResetPasswordContent() {
 
   return (
     <>
-      <TmLogo size="lg" className="mb-8" />
+      <TmLogo size="xl" className="mb-8" />
 
       <TmCard className="w-full">
         {success ? (

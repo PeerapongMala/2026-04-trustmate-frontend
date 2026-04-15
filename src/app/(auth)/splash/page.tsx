@@ -19,7 +19,7 @@ export default function SplashPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-tm-bg">
       <div className="animate-pulse">
-        <TmLogo size="lg" />
+        <TmLogo size="xl" />
       </div>
     </div>
   );

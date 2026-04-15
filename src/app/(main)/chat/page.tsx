@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { TmLogo } from "@/shared/components";
+import { TmMetAvatar } from "@/shared/components/TmMetAvatar";
 import { api } from "@/shared/lib/api";
 
 interface ChatMessage {
