@@ -5,10 +5,13 @@ import { useRouter } from "next/navigation";
 import { TmLogo, TmButton, TmMoodWheel } from "@/shared/components";
 import { api } from "@/shared/lib/api";
 
+// อารมณ์ที่ถือว่าแย่เกินเกณฑ์ → trigger แบบประเมิน
+const CONCERNING_MOODS = ["เศร้าซึม", "เปล่าเปลี่ยว", "กลัว", "กังวล"];
+
 function isWithinMoodHours(): boolean {
   const now = new Date();
   const hour = now.getHours();
-  return hour >= 12 && hour <= 23; // 12:00 - 23:59
+  return hour >= 12 && hour <= 23;
 }
 
 export default function MoodPage() {
@@ -17,6 +20,7 @@ export default function MoodPage() {
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
   const [available, setAvailable] = useState(true);
+  const [showPrompt, setShowPrompt] = useState(false);
 
   useEffect(() => {
     setAvailable(isWithinMoodHours());
@@ -27,7 +31,14 @@ export default function MoodPage() {
 
     setLoading(true);
     await api.post("/mood", { mood: selectedMood, note: note || undefined });
-    router.push("/");
+
+    // ถ้า mood แย่เกินเกณฑ์ → ถามว่าอยากทำแบบประเมินมั้ย
+    if (CONCERNING_MOODS.includes(selectedMood)) {
+      setLoading(false);
+      setShowPrompt(true);
+    } else {
+      router.push("/");
+    }
   }
 
   if (!available) {
@@ -50,6 +61,33 @@ export default function MoodPage() {
           <div className="mt-6">
             <TmButton variant="outline" onClick={() => router.push("/")}>
               กลับหน้าหลัก
+            </TmButton>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Prompt ให้ทำแบบประเมิน
+  if (showPrompt) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center px-4">
+        <TmLogo size="lg" className="mb-8" />
+        <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-sm border border-tm-light/50 text-center">
+          <span className="text-5xl">💛</span>
+          <h1 className="mt-4 text-lg font-bold text-tm-navy">
+            เราเป็นห่วงคุณนะ
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-tm-gray">
+            ช่วงนี้คุณดูเหนื่อย ๆ อยากลองทำแบบประเมินสุขภาพจิตดูมั้ย?
+            เพื่อให้เราช่วยดูแลคุณได้ดีขึ้น
+          </p>
+          <div className="mt-6 flex flex-col gap-3">
+            <TmButton onClick={() => router.push("/care/assessment")}>
+              ทำแบบประเมิน
+            </TmButton>
+            <TmButton variant="outline" onClick={() => router.push("/")}>
+              ไว้ทีหลัง
             </TmButton>
           </div>
         </div>
