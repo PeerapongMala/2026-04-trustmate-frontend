@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-tm-bg: #FFFCF4;
+  --color-tm-light: #D8E1ED;
+  --color-tm-blue: #B1C9EB;
+  --color-tm-orange: #E47B18;
+  --color-tm-navy: #31356E;
+  --color-tm-gray: #494F56;
+  --color-tm-black: #000000;
+}
+
+body {
+  background: var(--color-tm-bg);
+  color: var(--color-tm-gray);
+  font-family: 'Sarabun', Arial, Helvetica, sans-serif;
+}
