@@ -1,22 +1,60 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { TmLogo, TmButton, TmMoodWheel } from "@/shared/components";
 import { api } from "@/shared/lib/api";
+
+function isWithinMoodHours(): boolean {
+  const now = new Date();
+  const hour = now.getHours();
+  return hour >= 12 && hour <= 23; // 12:00 - 23:59
+}
 
 export default function MoodPage() {
   const router = useRouter();
   const [selectedMood, setSelectedMood] = useState("");
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
+  const [available, setAvailable] = useState(true);
+
+  useEffect(() => {
+    setAvailable(isWithinMoodHours());
+  }, []);
 
   async function handleSubmit() {
-    if (!selectedMood) return;
+    if (!selectedMood || !available) return;
 
     setLoading(true);
     await api.post("/mood", { mood: selectedMood, note: note || undefined });
     router.push("/");
+  }
+
+  if (!available) {
+    return (
+      <div className="px-4 pt-4">
+        <header className="flex items-center justify-center py-2">
+          <TmLogo size="sm" />
+        </header>
+        <div className="mt-20 text-center">
+          <span className="text-5xl">🌙</span>
+          <h1 className="mt-4 text-lg font-bold text-tm-navy">
+            วงล้ออารมณ์ยังไม่เปิด
+          </h1>
+          <p className="mt-2 text-sm text-tm-gray">
+            เปิดให้บันทึกอารมณ์ช่วง 12:00 - 23:59 น.
+          </p>
+          <p className="mt-1 text-sm text-tm-gray">
+            กลับมาอีกทีตอนบ่ายนะ
+          </p>
+          <div className="mt-6">
+            <TmButton variant="outline" onClick={() => router.push("/")}>
+              กลับหน้าหลัก
+            </TmButton>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
