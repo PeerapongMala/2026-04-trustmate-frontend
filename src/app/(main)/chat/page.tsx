@@ -11,12 +11,40 @@ interface ChatMessage {
   content: string;
 }
 
+interface ChatSession {
+  id: string;
+  createdAt: string;
+}
+
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  // โหลด session ล่าสุดเมื่อเข้าหน้า chat
+  useEffect(() => {
+    async function loadLastSession() {
+      const { data: sessions } = await api.get<ChatSession[]>("/chat/sessions");
+
+      if (sessions && sessions.length > 0) {
+        const lastSession = sessions[0];
+        setSessionId(lastSession.id);
+
+        const { data: msgs } = await api.get<ChatMessage[]>(
+          `/chat/sessions/${lastSession.id}`
+        );
+        if (msgs) {
+          setMessages(msgs);
+        }
+      }
+      setInitialLoading(false);
+    }
+
+    loadLastSession();
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -71,12 +99,13 @@ export default function ChatPage() {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 pb-20">
-        {messages.length === 0 && (
+        {initialLoading ? (
+          <div className="flex items-center justify-center pt-10">
+            <p className="text-sm text-tm-gray">กำลังโหลดแชท...</p>
+          </div>
+        ) : messages.length === 0 ? (
           <div className="flex flex-col items-center gap-2 pt-10 text-center">
-            {/* เมท avatar */}
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-tm-light">
-              <span className="text-2xl">👩‍🏫</span>
-            </div>
+            <TmMetAvatar size="lg" />
             <p className="text-sm text-tm-gray">
               สวัสดี เราชื่อ &quot;เมท&quot; นะ
             </p>
@@ -84,7 +113,7 @@ export default function ChatPage() {
               เราอยู่ตรงนี้เพื่อรับฟังคุณนะ
             </p>
           </div>
-        )}
+        ) : null}
 
         {messages.map((msg) => (
           <div
@@ -92,8 +121,8 @@ export default function ChatPage() {
             className={`mb-3 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             {msg.role === "assistant" && (
-              <div className="mr-2 mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-tm-light">
-                <span className="text-sm">👩‍🏫</span>
+              <div className="mr-2 mt-1 flex-shrink-0">
+                <TmMetAvatar size="sm" />
               </div>
             )}
             <div
@@ -110,8 +139,8 @@ export default function ChatPage() {
 
         {loading && (
           <div className="mb-3 flex justify-start">
-            <div className="mr-2 mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-tm-light">
-              <span className="text-sm">👩‍🏫</span>
+            <div className="mr-2 mt-1 flex-shrink-0">
+              <TmMetAvatar size="sm" />
             </div>
             <div className="rounded-2xl bg-tm-light px-4 py-2.5 text-sm text-tm-gray">
               กำลังพิมพ์...
