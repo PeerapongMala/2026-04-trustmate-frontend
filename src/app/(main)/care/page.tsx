@@ -71,7 +71,9 @@ export default function CarePage() {
           <p className="mt-2">
             เพราะทุกความรู้สึกของคุณมีค่ายิ่งกว่าที่คิด 🤝
           </p>
-          <TmLogo size="sm" className="mx-auto mt-4" />
+          <div className="mt-4 flex justify-center">
+            <TmLogo size="sm" />
+          </div>
         </div>
       </div>
     </div>
