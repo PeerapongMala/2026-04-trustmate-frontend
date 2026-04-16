@@ -111,7 +111,7 @@ export default function BookingPage() {
     const y = calendarMonth.getFullYear();
     const m = calendarMonth.getMonth();
     const dateStr = `${y}-${String(m + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    return availableDates.includes(dateStr);
+    return availableDates.some((d) => d.slice(0, 10) === dateStr);
   }
 
   function formatDateStr(day: number) {
