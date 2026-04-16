@@ -8,6 +8,14 @@ import { PostCard } from "@/features/community/PostCard";
 import { api } from "@/shared/lib/api";
 import type { Post, PostsResponse } from "@/shared/types/post";
 
+const REPORT_REASONS = [
+  "สแปม / โฆษณา",
+  "เนื้อหาไม่เหมาะสม",
+  "ชักชวนทำร้ายตัวเอง / ผู้อื่น",
+  "ด่า / ข่มขู่ / กลั่นแกล้ง",
+  "อื่นๆ",
+];
+
 interface TodayCardData {
   question: { id: string; question: string } | null;
   answer: { id: string; answer: string } | null;
@@ -21,6 +29,12 @@ export default function HomePage() {
   const [todayCard, setTodayCard] = useState<TodayCardData | null>(null);
   const [cardAnswer, setCardAnswer] = useState("");
   const [cardSubmitting, setCardSubmitting] = useState(false);
+
+  // Report modal state
+  const [reportPostId, setReportPostId] = useState<string | null>(null);
+  const [reportReason, setReportReason] = useState("");
+  const [reportSubmitting, setReportSubmitting] = useState(false);
+  const [reportDone, setReportDone] = useState(false);
 
   const fetchPosts = useCallback(async () => {
     const token = localStorage.getItem("token");
@@ -70,7 +84,23 @@ export default function HomePage() {
   }
 
   function handleReport(postId: string) {
-    api.post(`/posts/${postId}/report`, { reason: "เนื้อหาไม่เหมาะสม" });
+    setReportPostId(postId);
+    setReportReason("");
+    setReportDone(false);
+  }
+
+  async function submitReport() {
+    if (!reportPostId || !reportReason) return;
+    setReportSubmitting(true);
+    await api.post(`/posts/${reportPostId}/report`, { reason: reportReason });
+    setReportSubmitting(false);
+    setReportDone(true);
+  }
+
+  function closeReport() {
+    setReportPostId(null);
+    setReportReason("");
+    setReportDone(false);
   }
 
   async function handleCardSubmit() {
@@ -126,6 +156,54 @@ export default function HomePage() {
           <path d="M12 5v14M5 12h14" strokeLinecap="round" />
         </svg>
       </Link>
+
+      {/* Report modal */}
+      <TmModal isOpen={!!reportPostId} onClose={closeReport}>
+        {reportDone ? (
+          <div className="flex flex-col items-center gap-4 py-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" className="h-8 w-8">
+                <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <p className="text-sm font-medium text-tm-navy">รายงานสำเร็จแล้ว</p>
+            <p className="text-xs text-tm-gray">ขอบคุณที่ช่วยรายงาน ทีมงานจะตรวจสอบต่อไป</p>
+            <button
+              onClick={closeReport}
+              className="rounded-full bg-tm-orange px-6 py-2 text-sm font-medium text-white"
+            >
+              ปิด
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            <h2 className="text-lg font-bold text-tm-navy">รายงานโพสต์</h2>
+            <p className="text-sm text-tm-gray">เลือกเหตุผลในการรายงาน</p>
+            <div className="flex flex-col gap-2">
+              {REPORT_REASONS.map((reason) => (
+                <button
+                  key={reason}
+                  onClick={() => setReportReason(reason)}
+                  className={`rounded-xl border px-4 py-3 text-left text-sm transition-colors ${
+                    reportReason === reason
+                      ? "border-tm-orange bg-tm-orange/10 text-tm-navy"
+                      : "border-tm-light text-tm-gray hover:bg-tm-light/50"
+                  }`}
+                >
+                  {reason}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={submitReport}
+              disabled={!reportReason || reportSubmitting}
+              className="rounded-full bg-tm-orange px-6 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+            >
+              {reportSubmitting ? "กำลังส่ง..." : "ส่งรายงาน"}
+            </button>
+          </div>
+        )}
+      </TmModal>
 
       {/* Today Card popup */}
       <TmModal isOpen={showTodayCard} onClose={() => setShowTodayCard(false)}>
