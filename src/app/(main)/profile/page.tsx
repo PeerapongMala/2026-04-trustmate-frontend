@@ -28,7 +28,7 @@ interface MoodEntry {
   createdAt: string;
 }
 
-const NEGATIVE_MOODS = ["เศร้าซึม", "เปล่าเปลี่ยว", "กลัว", "กังวล"];
+const NEGATIVE_MOODS = ["เศร้าซึม", "เบื่อหน่าย", "วิตกกลัว", "ว้าวุ่น"];
 const DAY_LABELS = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];
 
 export default function ProfilePage() {

@@ -4,14 +4,14 @@ import { useState } from "react";
 
 // ตาม design 7.png — 8 ช่อง ตามเข็มนาฬิกาจากบนสุด
 const MOODS = [
-  { name: "เบื่อหน่าย", color: "#C5E1A5" },  // เขียวเหลืองอ่อน
-  { name: "สับสน", color: "#FFD54F" },         // เหลือง
-  { name: "ประหลาดใจ", color: "#FFB74D" },     // ส้มอ่อน
-  { name: "กลัว", color: "#FF8A65" },          // ส้ม
-  { name: "กังวล", color: "#F48FB1" },         // ชมพู
-  { name: "อาย", color: "#CE93D8" },           // ม่วงอ่อน
-  { name: "เศร้าซึม", color: "#81D4FA" },      // ฟ้า
-  { name: "เปล่าเปลี่ยว", color: "#80CBC4" },  // เขียวน้ำเงิน (teal)
+  { name: "ลั๊ลลา", color: "#FFD700", dark: false },       // เหลือง
+  { name: "ประหลาดใจ", color: "#FF8C00", dark: false },     // ส้ม
+  { name: "ว้าวุ่น", color: "#E53935", dark: true },        // แดง
+  { name: "วิตกกลัว", color: "#F48FB1", dark: false },      // ชมพู
+  { name: "ฉุนเฉียว", color: "#9C27B0", dark: true },       // ม่วง
+  { name: "ขยะแขยง", color: "#1565C0", dark: true },        // น้ำเงิน
+  { name: "เศร้าซึม", color: "#42A5F5", dark: false },      // ฟ้า
+  { name: "เบื่อหน่าย", color: "#4CAF50", dark: false },    // เขียว
 ] as const;
 
 export type MoodName = (typeof MOODS)[number]["name"];
@@ -71,7 +71,8 @@ export function TmMoodWheel({ onSelect, selected }: TmMoodWheelProps) {
                 y={labelY}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                className="pointer-events-none font-medium fill-tm-navy"
+                className="pointer-events-none font-medium"
+                fill={mood.dark ? "#FFFFFF" : "#31356E"}
                 style={{ fontSize: "7px" }}
               >
                 {mood.name}

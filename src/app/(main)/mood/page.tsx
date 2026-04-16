@@ -6,7 +6,7 @@ import { TmLogo, TmButton, TmMoodWheel } from "@/shared/components";
 import { api } from "@/shared/lib/api";
 
 // อารมณ์ที่ถือว่าลบ/น่าเป็นห่วง
-const CONCERNING_MOODS = ["เศร้าซึม", "เปล่าเปลี่ยว", "กลัว", "กังวล"];
+const CONCERNING_MOODS = ["เศร้าซึม", "เบื่อหน่าย", "วิตกกลัว", "ว้าวุ่น"];
 
 // เกณฑ์ trigger แบบประเมิน: ≥57% ของ 7 วัน (4 วัน) — อ้างอิง PHQ-9 "more than half the days"
 const THRESHOLD_DAYS = 4;
