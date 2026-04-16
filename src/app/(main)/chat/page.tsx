@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { TmLogo } from "@/shared/components";
+import { TmLogo, TmModal } from "@/shared/components";
 import { TmMetAvatar } from "@/shared/components/TmMetAvatar";
 import { api } from "@/shared/lib/api";
 
@@ -22,15 +22,18 @@ export default function ChatPage() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [showHistory, setShowHistory] = useState(false);
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // โหลด session ล่าสุดเมื่อเข้าหน้า chat
   useEffect(() => {
     async function loadLastSession() {
-      const { data: sessions } = await api.get<ChatSession[]>("/chat/sessions");
+      const { data } = await api.get<ChatSession[]>("/chat/sessions");
 
-      if (sessions && sessions.length > 0) {
-        const lastSession = sessions[0];
+      if (data && data.length > 0) {
+        setSessions(data);
+        const lastSession = data[0];
         setSessionId(lastSession.id);
 
         const { data: msgs } = await api.get<ChatMessage[]>(
@@ -86,14 +89,57 @@ export default function ChatPage() {
     }
   }
 
+  function handleNewChat() {
+    setSessionId(null);
+    setMessages([]);
+  }
+
+  async function handleOpenHistory() {
+    const { data } = await api.get<ChatSession[]>("/chat/sessions");
+    if (data) setSessions(data);
+    setShowHistory(true);
+  }
+
+  async function handleSelectSession(session: ChatSession) {
+    setSessionId(session.id);
+    const { data: msgs } = await api.get<ChatMessage[]>(
+      `/chat/sessions/${session.id}`
+    );
+    if (msgs) setMessages(msgs);
+    setShowHistory(false);
+  }
+
   return (
     <div className="flex h-screen flex-col">
       {/* Header */}
       <header className="flex items-center gap-3 border-b border-tm-light px-4 py-3">
         <TmLogo size="sm" />
-        <div>
+        <div className="flex-1">
           <span className="text-lg font-bold text-tm-navy">LET&apos;S TALK</span>
           <span className="ml-2 text-sm text-tm-orange">with AI Chatbot</span>
+        </div>
+        <div className="flex items-center gap-1">
+          {/* History button */}
+          <button
+            onClick={handleOpenHistory}
+            className="rounded-full p-2 text-tm-gray hover:bg-tm-light"
+            title="ดูประวัติ"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+          </button>
+          {/* New chat button */}
+          <button
+            onClick={handleNewChat}
+            className="rounded-full p-2 text-tm-orange hover:bg-tm-orange/10"
+            title="เริ่มแชทใหม่"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
+              <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+            </svg>
+          </button>
         </div>
       </header>
 
@@ -173,6 +219,51 @@ export default function ChatPage() {
           </button>
         </div>
       </div>
+
+      {/* History modal */}
+      <TmModal isOpen={showHistory} onClose={() => setShowHistory(false)}>
+        <h2 className="mb-4 text-lg font-bold text-tm-navy">ประวัติการสนทนา</h2>
+        {sessions.length === 0 ? (
+          <p className="py-6 text-center text-sm text-tm-gray/50">ยังไม่มีประวัติ</p>
+        ) : (
+          <div className="flex max-h-80 flex-col gap-2 overflow-y-auto">
+            {sessions.map((s, i) => (
+              <button
+                key={s.id}
+                onClick={() => handleSelectSession(s)}
+                className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left transition-colors ${
+                  s.id === sessionId
+                    ? "border-tm-orange bg-tm-orange/10"
+                    : "border-tm-light hover:bg-tm-light/50"
+                }`}
+              >
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-tm-light text-sm font-bold text-tm-navy">
+                  {sessions.length - i}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-tm-navy">
+                    {s.id === sessionId ? "สนทนาปัจจุบัน" : `สนทนาที่ ${sessions.length - i}`}
+                  </p>
+                  <p className="text-xs text-tm-gray">
+                    {new Date(s.createdAt).toLocaleDateString("th-TH", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+                {s.id === sessionId && (
+                  <span className="rounded-full bg-tm-orange px-2 py-0.5 text-[10px] text-white">
+                    ปัจจุบัน
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+      </TmModal>
     </div>
   );
 }
