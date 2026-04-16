@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { BackendWarmer } from "@/shared/components/BackendWarmer";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="th" className="h-full">
       <body className="min-h-full bg-tm-bg text-tm-gray antialiased">
+        <BackendWarmer />
         {children}
       </body>
     </html>
