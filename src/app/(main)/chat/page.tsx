@@ -98,7 +98,7 @@ export default function ChatPage() {
       </header>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 pb-28">
+      <div className="flex-1 overflow-y-auto px-4 py-4 pb-36">
         {initialLoading ? (
           <div className="flex items-center justify-center pt-10">
             <p className="text-sm text-tm-gray">กำลังโหลดแชท...</p>
@@ -152,7 +152,7 @@ export default function ChatPage() {
       </div>
 
       {/* Input bar */}
-      <div className="fixed bottom-[4.5rem] left-0 right-0 border-t border-tm-light bg-tm-bg px-4 py-3">
+      <div className="fixed bottom-[5.5rem] left-0 right-0 border-t border-tm-light bg-tm-bg px-4 py-3">
         <div className="mx-auto flex max-w-md items-center gap-2">
           <input
             type="text"
