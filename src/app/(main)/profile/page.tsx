@@ -160,16 +160,39 @@ export default function ProfilePage() {
           <p className="text-sm text-tm-gray">{user.bio || "คำอธิบาย"}</p>
         </div>
         <TmAvatar size="lg" color={user.avatarColor || undefined} />
-        <button
-          onClick={() => setShowMenu(!showMenu)}
-          className="text-tm-gray hover:text-tm-navy"
-        >
-          <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-            <circle cx="12" cy="5" r="2" />
-            <circle cx="12" cy="12" r="2" />
-            <circle cx="12" cy="19" r="2" />
-          </svg>
-        </button>
+        <div className="relative">
+          <button
+            onClick={() => setShowMenu(!showMenu)}
+            className="text-tm-gray hover:text-tm-navy"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+              <circle cx="12" cy="5" r="2" />
+              <circle cx="12" cy="12" r="2" />
+              <circle cx="12" cy="19" r="2" />
+            </svg>
+          </button>
+          {showMenu && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
+              <div className="absolute right-0 top-8 z-50 w-48 rounded-2xl border border-tm-light bg-white py-2 shadow-lg">
+                {user.provider === "local" && (
+                  <button
+                    onClick={() => { setShowMenu(false); setShowChangePassword(true); setPwError(""); setPwSuccess(""); }}
+                    className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-tm-gray hover:bg-tm-light/50"
+                  >
+                    เปลี่ยนรหัสผ่าน
+                  </button>
+                )}
+                <button
+                  onClick={() => { setShowMenu(false); setShowDeleteConfirm(true); }}
+                  className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-red-500 hover:bg-red-50"
+                >
+                  ลบบัญชี
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Edit button */}
@@ -273,33 +296,6 @@ export default function ProfilePage() {
           ออกจากระบบ
         </TmButton>
       </div>
-
-      {/* Menu Modal */}
-      <TmModal isOpen={showMenu} onClose={() => setShowMenu(false)}>
-        <h2 className="mb-4 text-lg font-bold text-tm-navy">ตั้งค่า</h2>
-        <div className="flex flex-col gap-2">
-          {user.provider === "local" && (
-            <button
-              onClick={() => { setShowMenu(false); setShowChangePassword(true); setPwError(""); setPwSuccess(""); }}
-              className="flex items-center gap-3 rounded-xl border border-tm-light px-4 py-3 text-left text-sm text-tm-gray hover:bg-tm-light/50"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0110 0v4" />
-              </svg>
-              เปลี่ยนรหัสผ่าน
-            </button>
-          )}
-          <button
-            onClick={() => { setShowMenu(false); setShowDeleteConfirm(true); }}
-            className="flex items-center gap-3 rounded-xl border border-red-200 px-4 py-3 text-left text-sm text-red-500 hover:bg-red-50"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
-              <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14" />
-            </svg>
-            ลบบัญชี
-          </button>
-        </div>
-      </TmModal>
 
       {/* Change Password Modal */}
       <TmModal isOpen={showChangePassword} onClose={() => setShowChangePassword(false)}>
