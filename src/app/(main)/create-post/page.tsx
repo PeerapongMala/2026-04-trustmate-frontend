@@ -59,7 +59,6 @@ export default function CreatePostPage() {
             className="rounded-full border border-tm-light bg-white px-3 py-1.5 text-sm text-tm-navy"
           >
             <option value="public">สาธารณะ</option>
-            <option value="anonymous">ไม่ระบุตัวตน</option>
             <option value="private">ส่วนตัว</option>
           </select>
 
