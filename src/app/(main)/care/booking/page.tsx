@@ -75,15 +75,12 @@ export default function BookingPage() {
     const { error } = await api.post("/bookings", {
       therapistId: selectedTherapist.id,
       slotId: selectedSlot.id,
-      fullName,
-      birthDate,
-      genderBirth,
-      genderIdentity,
-      phone,
     });
 
     if (!error) {
       setStep(4);
+    } else {
+      alert("จองไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
     }
     setLoading(false);
   }
