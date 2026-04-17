@@ -379,7 +379,7 @@ export default function BookingPage() {
           </div>
         </header>
 
-        <div className="mx-4 rounded-3xl border border-tm-light bg-white p-4">
+        <div className="mx-4 max-w-lg rounded-3xl border border-tm-light bg-white p-4 overflow-hidden">
           <TherapistSummary />
 
           {/* Appointment info */}
@@ -410,7 +410,7 @@ export default function BookingPage() {
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="mt-1 w-full rounded-xl border-0 bg-tm-light px-4 py-2.5 text-sm text-tm-navy outline-none"
+                className="mt-1 box-border w-full min-w-0 rounded-xl border-0 bg-tm-light px-4 py-2.5 text-sm text-tm-navy outline-none"
               />
             </div>
 
@@ -420,17 +420,17 @@ export default function BookingPage() {
                 type="date"
                 value={birthDate}
                 onChange={(e) => setBirthDate(e.target.value)}
-                className="mt-1 w-full rounded-xl border-0 bg-tm-light px-4 py-2.5 text-sm text-tm-navy outline-none"
+                className="mt-1 box-border w-full min-w-0 rounded-xl border-0 bg-tm-light px-4 py-2.5 text-sm text-tm-navy outline-none"
               />
             </div>
 
             <div className="flex gap-3">
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <label className="text-sm font-medium text-tm-navy">เพศกำเนิด</label>
                 <select
                   value={genderBirth}
                   onChange={(e) => setGenderBirth(e.target.value)}
-                  className="mt-1 w-full rounded-xl border-0 bg-tm-light px-4 py-2.5 text-sm text-tm-navy outline-none"
+                  className="mt-1 box-border w-full min-w-0 rounded-xl border-0 bg-tm-light px-4 py-2.5 text-sm text-tm-navy outline-none"
                 >
                   <option value="">เลือก</option>
                   {GENDER_OPTIONS.map((g) => (
@@ -438,13 +438,13 @@ export default function BookingPage() {
                   ))}
                 </select>
               </div>
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <label className="text-sm font-medium text-tm-navy">เพศสภาพ</label>
                 <input
                   type="text"
                   value={genderIdentity}
                   onChange={(e) => setGenderIdentity(e.target.value)}
-                  className="mt-1 w-full rounded-xl border-0 bg-tm-light px-4 py-2.5 text-sm text-tm-navy outline-none"
+                  className="mt-1 box-border w-full min-w-0 rounded-xl border-0 bg-tm-light px-4 py-2.5 text-sm text-tm-navy outline-none"
                   placeholder="ระบุ (ถ้ามี)"
                 />
               </div>
@@ -456,7 +456,7 @@ export default function BookingPage() {
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="mt-1 w-full rounded-xl border-0 bg-tm-light px-4 py-2.5 text-sm text-tm-navy outline-none"
+                className="mt-1 box-border w-full min-w-0 rounded-xl border-0 bg-tm-light px-4 py-2.5 text-sm text-tm-navy outline-none"
                 placeholder="0XX-XXX-XXXX"
               />
             </div>
