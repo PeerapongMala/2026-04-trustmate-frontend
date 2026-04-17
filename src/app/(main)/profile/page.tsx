@@ -235,7 +235,15 @@ export default function ProfilePage() {
             ) : (
               myPosts.map((post) => (
                 <TmCard key={post.id} className="bg-white">
-                  <p className="text-xs text-tm-orange">{post.tag}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs text-tm-orange">{post.tag}</p>
+                    {post.visibility === "private" && (
+                      <span className="rounded-full bg-tm-gray/10 px-2 py-0.5 text-[10px] text-tm-gray">ส่วนตัว</span>
+                    )}
+                    {post.visibility === "anonymous" && (
+                      <span className="rounded-full bg-tm-navy/10 px-2 py-0.5 text-[10px] text-tm-navy">ไม่ระบุตัวตน</span>
+                    )}
+                  </div>
                   <p className="mt-1 text-sm text-tm-gray whitespace-pre-wrap">{post.content}</p>
                   <div className="mt-2 flex items-center justify-between">
                     <span className="text-xs text-tm-gray/50">

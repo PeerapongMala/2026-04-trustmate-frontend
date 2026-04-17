@@ -60,6 +60,7 @@ export default function CreatePostPage() {
           >
             <option value="public">สาธารณะ</option>
             <option value="anonymous">ไม่ระบุตัวตน</option>
+            <option value="private">ส่วนตัว</option>
           </select>
 
           <div className="flex-1" />
