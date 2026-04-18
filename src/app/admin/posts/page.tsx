@@ -16,14 +16,17 @@ interface AdminPost {
 export default function AdminPostsPage() {
   const [posts, setPosts] = useState<AdminPost[]>([]);
   const [filter, setFilter] = useState("all");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function load() {
+      setError("");
       const status = filter === "all" ? "" : `?status=${filter}`;
-      const { data } = await api.get<{ data: AdminPost[] }>(
+      const { data, error } = await api.get<{ data: AdminPost[] }>(
         `/admin/posts${status}`
       );
       if (data) setPosts(data.data);
+      else setError(error || "ไม่สามารถโหลดข้อมูลได้ — กรุณา login ด้วย admin account ก่อน");
     }
     load();
   }, [filter]);
@@ -89,7 +92,13 @@ export default function AdminPostsPage() {
             </div>
           </TmCard>
         ))}
-        {posts.length === 0 && (
+        {error && (
+          <div className="py-10 text-center">
+            <p className="text-sm text-red-500">{error}</p>
+            <a href="/login" className="mt-2 inline-block text-sm text-tm-orange underline">ไปหน้า Login</a>
+          </div>
+        )}
+        {!error && posts.length === 0 && (
           <p className="text-center text-sm text-tm-gray">ไม่มีโพสต์</p>
         )}
       </div>

@@ -16,11 +16,13 @@ interface AdminReport {
 
 export default function AdminReportsPage() {
   const [reports, setReports] = useState<AdminReport[]>([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function load() {
-      const { data } = await api.get<{ data: AdminReport[] }>("/admin/reports");
+      const { data, error } = await api.get<{ data: AdminReport[] }>("/admin/reports");
       if (data) setReports(data.data);
+      else setError(error || "ไม่สามารถโหลดข้อมูลได้ — กรุณา login ด้วย admin account ก่อน");
     }
     load();
   }, []);
@@ -68,7 +70,13 @@ export default function AdminReportsPage() {
             </div>
           </TmCard>
         ))}
-        {reports.length === 0 && (
+        {error && (
+          <div className="py-10 text-center">
+            <p className="text-sm text-red-500">{error}</p>
+            <a href="/login" className="mt-2 inline-block text-sm text-tm-orange underline">ไปหน้า Login</a>
+          </div>
+        )}
+        {!error && reports.length === 0 && (
           <p className="text-center text-sm text-tm-gray">ไม่มี report ที่รอดู</p>
         )}
       </div>

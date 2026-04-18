@@ -14,14 +14,25 @@ interface DashboardStats {
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function load() {
-      const { data } = await api.get<DashboardStats>("/admin/dashboard");
+      const { data, error } = await api.get<DashboardStats>("/admin/dashboard");
       if (data) setStats(data);
+      else setError(error || "ไม่สามารถโหลดข้อมูลได้ — กรุณา login ด้วย admin account ก่อน");
     }
     load();
   }, []);
+
+  if (error) {
+    return (
+      <div className="py-10 text-center">
+        <p className="text-sm text-red-500">{error}</p>
+        <a href="/login" className="mt-2 inline-block text-sm text-tm-orange underline">ไปหน้า Login</a>
+      </div>
+    );
+  }
 
   if (!stats) {
     return <p className="text-center text-tm-gray">กำลังโหลด...</p>;
