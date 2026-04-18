@@ -8,6 +8,15 @@ import { TmLogo, TmInput, TmButton, TmCard } from "@/shared/components";
 import { api } from "@/shared/lib/api";
 import type { AuthResponse } from "@/shared/types/auth";
 
+function getRoleFromToken(token: string): string | null {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.role || null;
+  } catch {
+    return null;
+  }
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -31,7 +40,8 @@ export default function LoginPage() {
       }
       if (data?.accessToken) {
         localStorage.setItem("token", data.accessToken);
-        router.push("/");
+        const role = getRoleFromToken(data.accessToken);
+        router.push(role === "admin" ? "/admin" : "/");
       }
       setGoogleLoading(false);
     },
@@ -58,7 +68,8 @@ export default function LoginPage() {
 
     if (data?.accessToken) {
       localStorage.setItem("token", data.accessToken);
-      router.push("/");
+      const role = getRoleFromToken(data.accessToken);
+      router.push(role === "admin" ? "/admin" : "/");
     }
 
     setLoading(false);
