@@ -1,10 +1,28 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const NAV_ITEMS = [
+  { href: "/admin", label: "Dashboard" },
+  { href: "/admin/posts", label: "โพสต์" },
+  { href: "/admin/reports", label: "Reports" },
+  { href: "/admin/therapists", label: "ที่ปรึกษา" },
+  { href: "/admin/questions", label: "คำถาม" },
+];
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
+  function isActive(href: string) {
+    if (href === "/admin") return pathname === "/admin";
+    return pathname.startsWith(href);
+  }
+
   return (
     <div className="mx-auto min-h-screen max-w-4xl">
       {/* Admin header */}
@@ -17,17 +35,15 @@ export default function AdminLayout({
 
       {/* Admin nav */}
       <nav className="flex gap-1 overflow-x-auto border-b border-tm-light bg-tm-bg px-4 py-2">
-        {[
-          { href: "/admin", label: "Dashboard" },
-          { href: "/admin/posts", label: "โพสต์" },
-          { href: "/admin/reports", label: "Reports" },
-          { href: "/admin/therapists", label: "ที่ปรึกษา" },
-          { href: "/admin/questions", label: "คำถาม" },
-        ].map((item) => (
+        {NAV_ITEMS.map((item) => (
           <Link
             key={item.href}
             href={item.href}
-            className="whitespace-nowrap rounded-full px-3 py-1.5 text-sm text-tm-navy hover:bg-tm-light"
+            className={`whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition-colors ${
+              isActive(item.href)
+                ? "bg-tm-orange text-white font-medium"
+                : "text-tm-navy hover:bg-tm-light"
+            }`}
           >
             {item.label}
           </Link>
