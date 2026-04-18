@@ -6,6 +6,17 @@ import { TmLogo, TmButton, TmAvatar, TmTag } from "@/shared/components";
 import { api } from "@/shared/lib/api";
 import { TAGS } from "@/shared/types/post";
 
+const PROFANITY_LIST = [
+  "เหี้ย", "สัส", "ควย", "หี", "เย็ด", "ห่า", "แม่ง", "มึง", "กู",
+  "อีดอก", "อีสัตว์", "ไอ้สัตว์", "อีควาย", "ไอ้ควาย",
+  "สันดาน", "ชาติหมา", "ไอ้เวร", "อีเวร",
+];
+
+function containsProfanity(text: string): boolean {
+  const lower = text.toLowerCase();
+  return PROFANITY_LIST.some((word) => lower.includes(word));
+}
+
 export default function CreatePostPage() {
   const router = useRouter();
   const [content, setContent] = useState("");
@@ -13,6 +24,7 @@ export default function CreatePostPage() {
   const [visibility, setVisibility] = useState("public");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [profanityWarning, setProfanityWarning] = useState(false);
 
   async function handleSubmit() {
     if (!content.trim()) {
@@ -24,8 +36,15 @@ export default function CreatePostPage() {
       return;
     }
 
+    if (containsProfanity(content) && !profanityWarning) {
+      setProfanityWarning(true);
+      setError("มีการใช้คำที่ไม่เหมาะสม กรุณาปรับเปลี่ยน");
+      return;
+    }
+
     setLoading(true);
     setError("");
+    setProfanityWarning(false);
 
     const { error: apiError } = await api.post("/posts", {
       content: content.trim(),

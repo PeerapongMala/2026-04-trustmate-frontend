@@ -22,6 +22,7 @@ export default function ChatPage() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [showCrisisBanner, setShowCrisisBanner] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -68,6 +69,7 @@ export default function ChatPage() {
 
     const { data } = await api.post<{
       sessionId: string;
+      isCrisis?: boolean;
       message: ChatMessage;
     }>("/chat", {
       message: text,
@@ -77,6 +79,9 @@ export default function ChatPage() {
     if (data) {
       setSessionId(data.sessionId);
       setMessages((prev) => [...prev, data.message]);
+      if (data.isCrisis) {
+        setShowCrisisBanner(true);
+      }
     }
 
     setLoading(false);
@@ -196,6 +201,34 @@ export default function ChatPage() {
 
         <div ref={bottomRef} />
       </div>
+
+      {/* Crisis banner */}
+      {showCrisisBanner && (
+        <div className="fixed bottom-[8.5rem] left-0 right-0 z-40 px-4">
+          <div className="mx-auto max-w-md rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className="text-sm font-bold text-red-700">
+                  สายด่วนสุขภาพจิต
+                </p>
+                <p className="mt-1 text-xs text-red-600">
+                  ถ้าคุณต้องการคุยกับคนจริงๆ โทร{" "}
+                  <a href="tel:1323" className="font-bold underline">1323</a>{" "}
+                  ได้ตลอด 24 ชม.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowCrisisBanner(false)}
+                className="mt-0.5 text-red-400 hover:text-red-600"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4">
+                  <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Input bar */}
       <div className="fixed bottom-[5.5rem] left-0 right-0 border-t border-tm-light bg-tm-bg px-4 py-3">

@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { TmAvatar } from "@/shared/components";
 import type { Post } from "@/shared/types/post";
+
+const TRUNCATE_LENGTH = 200;
 
 interface PostCardProps {
   post: Post;
@@ -10,12 +13,19 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, onHug, onReport }: PostCardProps) {
+  const [expanded, setExpanded] = useState(false);
+  const isTruncated = post.content.length > TRUNCATE_LENGTH;
+  const displayContent =
+    isTruncated && !expanded
+      ? post.content.slice(0, TRUNCATE_LENGTH) + "..."
+      : post.content;
+
   return (
     <article className="border-b border-tm-light px-4 py-4">
       {/* Header */}
       <div className="flex items-start gap-3">
         <TmAvatar size="md" color={post.author.avatarColor || undefined} />
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between">
             <div>
               <span className="font-medium text-tm-navy">
@@ -35,9 +45,17 @@ export function PostCard({ post, onHug, onReport }: PostCardProps) {
           </div>
 
           {/* Content */}
-          <p className="mt-2 text-sm leading-relaxed text-tm-gray whitespace-pre-wrap">
-            {post.content}
+          <p className="mt-2 text-sm leading-relaxed text-tm-gray whitespace-pre-wrap break-words">
+            {displayContent}
           </p>
+          {isTruncated && !expanded && (
+            <button
+              onClick={() => setExpanded(true)}
+              className="mt-1 text-xs font-medium text-tm-orange hover:underline"
+            >
+              ดูเพิ่มเติม
+            </button>
+          )}
 
           {/* Hug button */}
           <div className="mt-3 flex items-center gap-2">
