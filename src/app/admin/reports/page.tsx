@@ -38,7 +38,7 @@ export default function AdminReportsPage() {
 
       <div className="mt-4 flex flex-col gap-3">
         {reports.map((r) => (
-          <TmCard key={r.id}>
+          <TmCard key={r.id} className="overflow-hidden">
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-tm-navy">
@@ -46,9 +46,9 @@ export default function AdminReportsPage() {
                 </span>
                 <span className="text-xs text-tm-gray">{r.targetType}</span>
               </div>
-              <p className="text-sm text-tm-gray">เหตุผล: {r.reason}</p>
+              <p className="break-all text-sm text-tm-gray">เหตุผล: {r.reason}</p>
               {r.post && (
-                <p className="text-sm text-tm-gray/70 line-clamp-2">
+                <p className="break-all text-sm text-tm-gray/70 line-clamp-2">
                   เนื้อหา: {r.post.content}
                 </p>
               )}

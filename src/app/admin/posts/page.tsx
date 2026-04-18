@@ -58,9 +58,9 @@ export default function AdminPostsPage() {
 
       <div className="mt-4 flex flex-col gap-3">
         {posts.map((post) => (
-          <TmCard key={post.id}>
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
+          <TmCard key={post.id} className="overflow-hidden">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-tm-navy">
                     {post.author.alias}
@@ -78,7 +78,7 @@ export default function AdminPostsPage() {
                     {post.flagStatus}
                   </span>
                 </div>
-                <p className="mt-1 text-sm text-tm-gray line-clamp-2">
+                <p className="mt-1 break-all text-sm text-tm-gray line-clamp-2">
                   {post.content}
                 </p>
               </div>
