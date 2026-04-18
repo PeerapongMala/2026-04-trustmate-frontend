@@ -8,9 +8,17 @@ interface AdminPost {
   id: string;
   content: string;
   tag: string;
+  visibility: string;
   flagStatus: string;
   createdAt: string;
   author: { alias: string; email: string };
+}
+
+function isHiddenFromFeed(post: AdminPost): string | null {
+  if (post.flagStatus === "blocked") return "ถูกบล็อก";
+  if (post.flagStatus === "flagged") return "ถูก Flag";
+  if (post.visibility === "private") return "ส่วนตัว";
+  return null;
 }
 
 interface Toast {
@@ -45,6 +53,18 @@ export default function AdminPostsPage() {
     }
     load();
   }, [filter]);
+
+  async function handleUpdateFlag(postId: string, flagStatus: "clean" | "blocked") {
+    const { error } = await api.patch(`/admin/posts/${postId}/flag`, { flagStatus });
+    if (error) {
+      showToast("อัปเดตไม่สำเร็จ: " + error, "error");
+      return;
+    }
+    setPosts((prev) =>
+      prev.map((p) => (p.id === postId ? { ...p, flagStatus } : p))
+    );
+    showToast(flagStatus === "clean" ? "อนุญาตโพสต์แล้ว" : "บล็อกโพสต์แล้ว");
+  }
 
   async function handleDelete(postId: string) {
     const { error } = await api.delete(`/admin/posts/${postId}`);
@@ -81,7 +101,7 @@ export default function AdminPostsPage() {
           <TmCard key={post.id} className="overflow-hidden">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="text-sm font-medium text-tm-navy">
                     {post.author.alias}
                   </span>
@@ -97,18 +117,50 @@ export default function AdminPostsPage() {
                   >
                     {post.flagStatus}
                   </span>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[10px] ${
+                      post.visibility === "private"
+                        ? "bg-purple-100 text-purple-700"
+                        : "bg-blue-100 text-blue-700"
+                    }`}
+                  >
+                    {post.visibility === "private" ? "ส่วนตัว" : "สาธารณะ"}
+                  </span>
+                  {isHiddenFromFeed(post) && (
+                    <span className="rounded-full bg-orange-100 px-2 py-0.5 text-[10px] text-orange-700">
+                      ซ่อนจากฟีด: {isHiddenFromFeed(post)}
+                    </span>
+                  )}
                 </div>
                 <p className="mt-1 break-all text-sm text-tm-gray line-clamp-2">
                   {post.content}
                 </p>
               </div>
-              <TmButton
-                variant="outline"
-                size="sm"
-                onClick={() => handleDelete(post.id)}
-              >
-                ลบ
-              </TmButton>
+              <div className="flex shrink-0 flex-col gap-1.5">
+                {post.flagStatus !== "clean" && (
+                  <TmButton
+                    size="sm"
+                    onClick={() => handleUpdateFlag(post.id, "clean")}
+                  >
+                    อนุญาต
+                  </TmButton>
+                )}
+                {post.flagStatus !== "blocked" && (
+                  <button
+                    onClick={() => handleUpdateFlag(post.id, "blocked")}
+                    className="rounded-full border border-red-300 px-3 py-1 text-xs text-red-500 transition-colors hover:bg-red-50"
+                  >
+                    บล็อก
+                  </button>
+                )}
+                <TmButton
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleDelete(post.id)}
+                >
+                  ลบ
+                </TmButton>
+              </div>
             </div>
           </TmCard>
         ))}
