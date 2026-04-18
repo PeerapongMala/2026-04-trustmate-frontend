@@ -1,49 +1,69 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { TmButton, TmCard, TmInput } from "@/shared/components";
 import { api } from "@/shared/lib/api";
+
+interface Toast {
+  id: number;
+  message: string;
+  type: "success" | "error";
+}
 
 export default function AdminQuestionsPage() {
   const [assessmentText, setAssessmentText] = useState("");
   const [assessmentOrder, setAssessmentOrder] = useState("");
   const [todayQuestion, setTodayQuestion] = useState("");
   const [todayDate, setTodayDate] = useState("");
-  const [message, setMessage] = useState("");
+  const [toasts, setToasts] = useState<Toast[]>([]);
+
+  const showToast = useCallback((message: string, type: "success" | "error" = "success") => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 3000);
+  }, []);
 
   async function handleAddAssessment() {
-    if (!assessmentText || !assessmentOrder) return;
+    if (!assessmentText || !assessmentOrder) {
+      showToast("กรุณากรอกข้อมูลให้ครบ", "error");
+      return;
+    }
     const { error } = await api.post("/admin/assessment-questions", {
       text: assessmentText,
       order: parseInt(assessmentOrder, 10),
     });
-    if (!error) {
-      setMessage("เพิ่มคำถามแบบประเมินสำเร็จ");
-      setAssessmentText("");
-      setAssessmentOrder("");
+    if (error) {
+      showToast("เพิ่มไม่สำเร็จ: " + error, "error");
+      return;
     }
+    showToast("เพิ่มคำถามแบบประเมินสำเร็จ");
+    setAssessmentText("");
+    setAssessmentOrder("");
   }
 
   async function handleAddToday() {
-    if (!todayQuestion || !todayDate) return;
+    if (!todayQuestion || !todayDate) {
+      showToast("กรุณากรอกข้อมูลให้ครบ", "error");
+      return;
+    }
     const { error } = await api.post("/admin/today-questions", {
       question: todayQuestion,
       date: todayDate,
     });
-    if (!error) {
-      setMessage("เพิ่มคำถาม Today Card สำเร็จ");
-      setTodayQuestion("");
-      setTodayDate("");
+    if (error) {
+      showToast("เพิ่มไม่สำเร็จ: " + error, "error");
+      return;
     }
+    showToast("เพิ่มคำถาม Today Card สำเร็จ");
+    setTodayQuestion("");
+    setTodayDate("");
   }
 
   return (
     <div>
       <h1 className="text-xl font-bold text-tm-navy">จัดการคำถาม</h1>
-
-      {message && (
-        <p className="mt-2 text-sm text-green-600">{message}</p>
-      )}
 
       {/* Assessment Questions */}
       <TmCard className="mt-4">
@@ -89,6 +109,21 @@ export default function AdminQuestionsPage() {
           </TmButton>
         </div>
       </TmCard>
+
+      {/* Toast */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2">
+        {toasts.map((t) => (
+          <div
+            key={t.id}
+            className={`rounded-xl px-4 py-3 text-sm font-medium text-white shadow-lg ${
+              t.type === "success" ? "bg-green-600" : "bg-red-500"
+            }`}
+          >
+            {t.type === "success" ? "✓ " : "✕ "}
+            {t.message}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

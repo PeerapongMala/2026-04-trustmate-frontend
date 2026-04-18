@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { TmButton, TmCard } from "@/shared/components";
 import { api } from "@/shared/lib/api";
 
@@ -13,10 +13,25 @@ interface AdminPost {
   author: { alias: string; email: string };
 }
 
+interface Toast {
+  id: number;
+  message: string;
+  type: "success" | "error";
+}
+
 export default function AdminPostsPage() {
   const [posts, setPosts] = useState<AdminPost[]>([]);
   const [filter, setFilter] = useState("all");
   const [error, setError] = useState("");
+  const [toasts, setToasts] = useState<Toast[]>([]);
+
+  const showToast = useCallback((message: string, type: "success" | "error" = "success") => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 3000);
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -32,8 +47,13 @@ export default function AdminPostsPage() {
   }, [filter]);
 
   async function handleDelete(postId: string) {
-    await api.delete(`/admin/posts/${postId}`);
+    const { error } = await api.delete(`/admin/posts/${postId}`);
+    if (error) {
+      showToast("ลบไม่สำเร็จ: " + error, "error");
+      return;
+    }
     setPosts((prev) => prev.filter((p) => p.id !== postId));
+    showToast("ลบโพสต์สำเร็จ");
   }
 
   return (
@@ -101,6 +121,21 @@ export default function AdminPostsPage() {
         {!error && posts.length === 0 && (
           <p className="text-center text-sm text-tm-gray">ไม่มีโพสต์</p>
         )}
+      </div>
+
+      {/* Toast */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2">
+        {toasts.map((t) => (
+          <div
+            key={t.id}
+            className={`rounded-xl px-4 py-3 text-sm font-medium text-white shadow-lg ${
+              t.type === "success" ? "bg-green-600" : "bg-red-500"
+            }`}
+          >
+            {t.type === "success" ? "✓ " : "✕ "}
+            {t.message}
+          </div>
+        ))}
       </div>
     </div>
   );
