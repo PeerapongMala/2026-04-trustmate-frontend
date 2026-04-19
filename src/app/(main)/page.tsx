@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { TmLogo, TmLoading, TmEmpty, TmModal } from "@/shared/components";
-import { PostCard } from "@/features/community/PostCard";
+import { PostCard } from "@/shared/components/PostCard";
 import { api } from "@/shared/lib/api";
 import type { Post, PostsResponse } from "@/shared/types/post";
 
